@@ -1,0 +1,16 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'uz.miniuz.browser'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId 'uz.miniuz.browser'
+        minSdk 23
+        targetSdk 36
+        versionCode 1
+        versionName '1.0'
+    }
+}
