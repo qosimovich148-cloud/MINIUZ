@@ -19,17 +19,16 @@ jobs:
           distribution: temurin
           java-version: '21'
 
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          gradle-version: '9.7.1'
+
       - name: Set up Android SDK
         uses: android-actions/setup-android@v4
 
       - name: Install Android SDK 36
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
-
-      - name: Install Gradle 9.6.0
-        run: |
-          wget -q https://services.gradle.org/distributions/gradle-9.6-bin.zip
-          unzip -q gradle-9.6-bin.zip -d "$HOME"
-          echo "$HOME/gradle-9.6/bin" >> "$GITHUB_PATH"
 
       - name: Build AAB
         run: gradle bundleRelease
