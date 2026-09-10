@@ -81,7 +81,7 @@ public class MainActivity extends Activity {
 
     private final Handler handler = new Handler();
 
-    private static final String HOME_URL = "https://www.google.com";
+    private static final String HOME_URL = "file:///android_asset/home.html";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,8 +140,7 @@ public class MainActivity extends Activity {
         toolbar.addView(refreshButton, fixed(42));
         toolbar.addView(menuButton, fixed(42));
 
-        browserRoot.addView(toolbar,
-                new LinearLayout.LayoutParams(-1, dp(56)));
+        // toolbar hidden - fullscreen mode
 
         HorizontalScrollView tabScroll = new HorizontalScrollView(this);
         tabScroll.setHorizontalScrollBarEnabled(false);
@@ -155,8 +154,7 @@ public class MainActivity extends Activity {
         tabScroll.addView(tabBar,
                 new ViewGroup.LayoutParams(-2, dp(42)));
 
-        browserRoot.addView(tabScroll,
-                new LinearLayout.LayoutParams(-1, dp(42)));
+        // tabScroll hidden - fullscreen mode
 
         progressBar = new ProgressBar(
                 this,
@@ -174,6 +172,16 @@ public class MainActivity extends Activity {
 
         browserRoot.addView(webContainer,
                 new LinearLayout.LayoutParams(-1, 0, 1));
+
+        TextView floatingMenuBtn = toolbarButton("⋮");
+        floatingMenuBtn.setBackground(roundDrawable(Color.argb(160,0,0,0), 20));
+        floatingMenuBtn.setTextColor(Color.WHITE);
+        FrameLayout.LayoutParams fmp = new FrameLayout.LayoutParams(dp(40), dp(40));
+        fmp.gravity = Gravity.TOP | Gravity.END;
+        fmp.topMargin = dp(14);
+        fmp.rightMargin = dp(10);
+        floatingMenuBtn.setOnClickListener(v -> showMenu());
+        webContainer.addView(floatingMenuBtn, fmp);
 
         setContentView(browserRoot);
 
@@ -206,6 +214,9 @@ public class MainActivity extends Activity {
 
         newTab(HOME_URL);
         applyTheme();
+        floatingMenuBtn.bringToFront();
+        webContainer.requestLayout();
+        webContainer.invalidate();
     }
 
     private void newTab(String url) {
@@ -228,6 +239,17 @@ public class MainActivity extends Activity {
         }
 
         refreshTabs();
+    }
+
+    private class AndroidBridge {
+        @android.webkit.JavascriptInterface
+        public void openHistory() { runOnUiThread(MainActivity.this::showHistory); }
+        @android.webkit.JavascriptInterface
+        public void openBookmarks() { runOnUiThread(MainActivity.this::showBookmarks); }
+        @android.webkit.JavascriptInterface
+        public void openDownloads() { runOnUiThread(MainActivity.this::showDownloads); }
+        @android.webkit.JavascriptInterface
+        public void toast(String msg) { runOnUiThread(() -> Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show()); }
     }
 
     private WebView createWebView() {
@@ -254,6 +276,7 @@ public class MainActivity extends Activity {
         }
 
         CookieManager.getInstance().setAcceptCookie(true);
+        webView.addJavascriptInterface(new AndroidBridge(), "Android");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             s.setForceDark(
@@ -317,6 +340,22 @@ public class MainActivity extends Activity {
                 }
 
                 addHistory(url, title);
+
+                boolean isFileUrl = (url != null) && url.startsWith("file://");
+
+                if (darkMode && !isFileUrl) {
+                    String css =
+                        "(function(){" +
+                        "var id='__miniuz_dark_css__';" +
+                        "if(document.getElementById(id))return;" +
+                        "var s=document.createElement('style');" +
+                        "s.id=id;" +
+                        "s.innerHTML='html{filter:invert(1) hue-rotate(180deg);background:#111;}' +" +
+                        "'img,video,picture,canvas,svg,iframe{filter:invert(1) hue-rotate(180deg);}';" +
+                        "document.documentElement.appendChild(s);" +
+                        "})();";
+                    view.evaluateJavascript(css, null);
+                }
             }
         });
 
@@ -595,6 +634,24 @@ public class MainActivity extends Activity {
         tabBar.addView(plus, plusLp);
     }
 
+    private void showAddressInput() {
+        EditText input = new EditText(this);
+        input.setHint("Manzil yoki qidiruv...");
+        WebView w = currentWebView();
+        if (w != null && w.getUrl() != null) {
+            input.setText(w.getUrl());
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle("Manzilga o‘tish")
+                .setView(input)
+                .setPositiveButton("O‘tish", (dialog, which) -> {
+                    openAddress(input.getText().toString());
+                })
+                .setNegativeButton("Bekor qilish", null)
+                .show();
+    }
+
     private void showMenu() {
         if (activeMenu != null) return;
 
@@ -616,6 +673,9 @@ public class MainActivity extends Activity {
 
         addMenuItem(panel, "➕ Yangi tab",
                 () -> newTab(HOME_URL));
+
+        addMenuItem(panel, "🔗 Manzil kiritish",
+                this::showAddressInput);
 
         addMenuItem(panel, "⭐ Bookmark qo‘shish",
                 this::addBookmark);

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>MiniUZ</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; background:#151515; font-family:sans-serif; overflow-x:hidden; }
+  .bg-glow { position:fixed; bottom:0; left:0; right:0; height:45%;
+    background:radial-gradient(ellipse at bottom, rgba(230,110,40,0.55) 0%, rgba(60,40,60,0.35) 45%, rgba(21,21,21,0) 75%);
+    z-index:0; }
+  .wrap { position:relative; z-index:1; padding:14vh 20px 0 20px; }
+  .brand { text-align:center; color:#f2f2f2; font-size:34px; font-weight:300; letter-spacing:1px; margin-bottom:36px; }
+  .search-box { display:flex; align-items:center; background:#26262a; border-radius:28px; padding:12px 18px; max-width:520px; margin:0 auto 36px auto; }
+  .search-box input { flex:1; background:transparent; border:none; outline:none; color:#e8e8e8; font-size:16px; margin-left:10px; }
+  .search-box input::placeholder { color:#8a8a8a; }
+  .g-icon { width:20px; height:20px; flex-shrink:0; }
+  .grid { display:grid; grid-template-columns:repeat(5, 1fr); gap:18px 8px; max-width:560px; margin:0 auto 30px auto; }
+  .item { display:flex; flex-direction:column; align-items:center; text-decoration:none; color:#ddd; cursor:pointer; }
+  .icon-circle { width:52px; height:52px; border-radius:50%; background:#232326; display:flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:8px; border:1px solid #333; overflow:hidden; }
+  .icon-circle img { width:100%; height:100%; object-fit:cover; }
+  .label { font-size:12px; color:#c9c9c9; text-align:center; max-width:70px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .divider { max-width:560px; margin:10px auto 20px auto; border-top:1px solid #2a2a2a; }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<div class="wrap">
+  <div class="brand">MiniUZ</div>
+
+  <div class="search-box" onclick="document.getElementById('q').focus()">
+    <svg class="g-icon" viewBox="0 0 48 48">
+      <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
+      <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/>
+      <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/>
+      <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/>
+    </svg>
+    <input id="q" type="text" placeholder="Qidirish yoki URL kiritish"
+           onkeydown="if(event.key==='Enter'||event.keyCode===13){event.preventDefault();goSearch();}">
+  </div>
+
+  <div class="grid">
+    <a class="item" onclick="callAndroid('downloads')">
+      <div class="icon-circle">&#8681;</div>
+      <div class="label">Yuklab olingan</div>
+    </a>
+    <a class="item" onclick="callAndroid('notes')">
+      <div class="icon-circle">&#128221;</div>
+      <div class="label">AI Notes</div>
+    </a>
+    <a class="item" onclick="callAndroid('ai')">
+      <div class="icon-circle">&#10024;</div>
+      <div class="label">AI savol</div>
+    </a>
+    <a class="item" onclick="callAndroid('history')">
+      <div class="icon-circle">&#128337;</div>
+      <div class="label">Tarix</div>
+    </a>
+    <a class="item" onclick="callAndroid('bookmarks')">
+      <div class="icon-circle">&#128278;</div>
+      <div class="label">Belgilagich</div>
+    </a>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="grid">
+    <a class="item" href="https://www.google.com">
+      <div class="icon-circle"><img src="https://www.google.com/s2/favicons?domain=google.com&amp;sz=64"></div>
+      <div class="label">Google</div>
+    </a>
+    <a class="item" href="https://www.youtube.com">
+      <div class="icon-circle"><img src="https://www.google.com/s2/favicons?domain=youtube.com&amp;sz=64"></div>
+      <div class="label">YouTube</div>
+    </a>
+    <a class="item" href="https://www.instagram.com">
+      <div class="icon-circle"><img src="https://www.google.com/s2/favicons?domain=instagram.com&amp;sz=64"></div>
+      <div class="label">Instagram</div>
+    </a>
+    <a class="item" href="https://t.me">
+      <div class="icon-circle"><img src="https://www.google.com/s2/favicons?domain=telegram.org&amp;sz=64"></div>
+      <div class="label">Telegram</div>
+    </a>
+    <a class="item" href="https://twitter.com">
+      <div class="icon-circle"><img src="https://www.google.com/s2/favicons?domain=twitter.com&amp;sz=64"></div>
+      <div class="label">X</div>
+    </a>
+  </div>
+</div>
+
+<script>
+function goSearch() {
+  var v = document.getElementById('q').value.trim();
+  if (!v) return;
+  var looksLikeUrl = /^([a-z]+:\/\/)/i.test(v) || (/\.[a-z]{2,}$/i.test(v) && !v.includes(' '));
+  if (looksLikeUrl) {
+    if (!/^[a-z]+:\/\//i.test(v)) v = 'https://' + v;
+    window.location.href = v;
+  } else {
+    window.location.href = 'https://www.google.com/search?q=' + encodeURIComponent(v);
+  }
+}
+function callAndroid(action) {
+  if (window.Android) {
+    if (action === 'history') Android.openHistory();
+    else if (action === 'bookmarks') Android.openBookmarks();
+    else if (action === 'downloads') Android.openDownloads();
+    else if (action === 'notes') Android.toast('Tez orada qoshiladi');
+    else if (action === 'ai') Android.toast('Tez orada qoshiladi');
+  }
+}
+</script>
+
+</body>
+</html>
